@@ -1,0 +1,35 @@
+apiVersion: apps/v2
+kind: Deployment
+metadata:
+  name: node-api-deployment
+  labels:
+    app: node-api
+spec:
+  replicas: 2 # We'll run 2 instances of our application
+  selector:
+    matchLabels:
+      app: node-api
+  template:
+    metadata:
+      labels:
+        app: node-api
+    spec:
+      containers:
+      - name: node-api
+        image: fafagrace/my-node-api:v2.1 # UPDATED IMAGE TAG
+        imagePullPolicy: Always # Always pull the image to ensure updates are picked up
+        ports:
+        - containerPort: 3000
+        livenessProbe: # Checks if the container is still running
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        readinessProbe: # Checks if the container is ready to serve traffic
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      automountServiceAccountToken: false
